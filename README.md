@@ -273,7 +273,9 @@ ENCRYPTION_KEY=generate-with-openssl # generate via `openssl rand -hex 32`
 
 **Problem:** Getting "invalid authentication credentials" error when trying to log in.
 
-**Solution:** This is usually caused by quotes in the environment files. Check your `.env` file and make sure you haven't wrapped the `ANON_KEY` or `SERVICE_ROLE_KEY` in quotes.
+**Solution 1.**
+
+It can be caused by having quotes in the environment files. Check your `.env` file and make sure you haven't wrapped the `ANON_KEY` or `SERVICE_ROLE_KEY` in quotes.
 
 **Incorrect:**
 ```bash
@@ -286,6 +288,26 @@ SUPABASE_SERVICE_ROLE_KEY="your-key-here"
 SUPABASE_ANON_KEY=your-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-key-here
 ```
+
+**Solution 2.**
+
+If you have made changes to the SUPABASE_ANON_KEY in your ENV file after initial setup, then you need to rebuild your InsightsLM container.
+
+For this, go to the start_service.py file
+
+Change line 77 from this
+
+    cmd.extend(["up", "-d"])
+
+to this
+
+    cmd.extend(["up", "-d", "--build"])
+
+Then trigger the start services command with your selected profile
+
+python start_services.py --profile <your-profile>
+
+This will take down any containers that are currently up and then rebuild the existing containers so they have the updated ENVs loaded in
 
 ### "Failed to Fetch" Error
 
